@@ -69,7 +69,7 @@ class Sequence(ImageProperty, abc.MutableSequence):
 
     def validate_position(self, index):
         if not isinstance(index, numbers.Integral):
-            raise TypeError('index must be integer, not ' + repr(index))
+            raise TypeError(f'index must be integer, not {repr(index)}')
         length = len(self)
         if index >= length or index < -length:
             raise IndexError(
@@ -80,7 +80,7 @@ class Sequence(ImageProperty, abc.MutableSequence):
         return index
 
     def validate_slice(self, slice_, as_range=False):
-        if not (slice_.step is None or slice_.step == 1):
+        if slice_.step is not None and slice_.step != 1:
             raise ValueError('slicing with step is unsupported')
         length = len(self)
         if slice_.start is None:
@@ -231,14 +231,13 @@ class Sequence(ImageProperty, abc.MutableSequence):
                             'images must consist of only instances of '
                             'wand.image.BaseImage, not ' + repr(image)
                         )
+                    library.MagickAddImage(wand, image.sequence[0].wand)
+                    self.instances = []
+                    if offset is None:
+                        library.MagickSetLastIterator(self.image.wand)
                     else:
-                        library.MagickAddImage(wand, image.sequence[0].wand)
-                        self.instances = []
-                        if offset is None:
-                            library.MagickSetLastIterator(self.image.wand)
-                        else:
-                            self.current_index += delta
-                        length += 1
+                        self.current_index += delta
+                    length += 1
         finally:
             self.current_index = tmp_idx
         null_list = [None] * length
@@ -325,7 +324,7 @@ class SingleImage(BaseImage):
     @delay.setter
     def delay(self, delay):
         if not isinstance(delay, numbers.Integral):
-            raise TypeError('delay must be an integer, not ' + repr(delay))
+            raise TypeError(f'delay must be an integer, not {repr(delay)}')
         elif delay < 0:
             raise ValueError('delay cannot be less than zero')
         container = self.container

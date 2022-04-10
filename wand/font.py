@@ -65,8 +65,7 @@ class Font(tuple):
        Added ``stroke_color`` & ``stoke_width`` paramaters.
     """
 
-    def __new__(cls, path, size=0, color=None, antialias=True,
-                stroke_color=None, stroke_width=None):
+    def __new__(self, path, size=0, color=None, antialias=True, stroke_color=None, stroke_width=None):
         assertions.assert_string(path=path)
         assertions.assert_real(size=size)
         if color is None:
@@ -81,8 +80,9 @@ class Font(tuple):
         if stroke_width is not None:
             assertions.assert_real(stroke_width=stroke_width)
         path = text(path)
-        return tuple.__new__(cls, (path, size, color, bool(antialias),
-                                   stroke_color, stroke_width))
+        return tuple.__new__(
+            self, (path, size, color, bool(antialias), stroke_color, stroke_width)
+        )
 
     @property
     def path(self):

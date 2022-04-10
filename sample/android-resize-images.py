@@ -26,13 +26,13 @@ if __name__ == "__main__":
                    files)
 
     for filename in files:
-        with Image(filename="res/drawable-xhdpi/%s" % filename) as img:
+        with Image(filename=f"res/drawable-xhdpi/{filename}") as img:
 
-            print("Resizing %s..." % filename)
+            print(f"Resizing {filename}...")
 
             width, height = img.size
 
             for dpi, ratio in MANIFEST:
                 cimg = img.clone()
                 cimg.resize(int(width * ratio), int(height * ratio))
-                cimg.save(filename="res/drawable-%sdpi/%s" % (dpi, filename))
+                cimg.save(filename=f"res/drawable-{dpi}dpi/{filename}")

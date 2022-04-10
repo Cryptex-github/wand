@@ -69,12 +69,10 @@ def deallocate_ref(addr):
 def shutdown():
     global allocation_map
     for addr in list(allocation_map):
-        try:
+        with contextlib.suppress(KeyError):
             deallocator = allocation_map.pop(addr)
             if callable(deallocator):
                 deallocator(addr)
-        except KeyError:
-            pass
     terminus()
 
 
@@ -147,7 +145,7 @@ class Resource(object):
 
         """
         if getattr(self, 'c_resource', None) is None:
-            raise DestroyedResourceError(repr(self) + ' is destroyed already')
+            raise DestroyedResourceError(f'{repr(self)} is destroyed already')
         return self.c_resource
 
     @resource.setter
@@ -156,11 +154,10 @@ class Resource(object):
         if getattr(self, 'c_resource', None):
             self.destroy()
 
-        if self.c_is_resource(resource):
-            self.c_resource = resource
-            allocate_ref(self.c_resource, self.c_destroy_resource)
-        else:
-            raise TypeError(repr(resource) + ' is an invalid resource')
+        if not self.c_is_resource(resource):
+            raise TypeError(f'{repr(resource)} is an invalid resource')
+        self.c_resource = resource
+        allocate_ref(self.c_resource, self.c_destroy_resource)
 
     @resource.deleter
     def resource(self):
@@ -231,10 +228,8 @@ class Resource(object):
         self.destroy()
 
     def __del__(self):
-        try:
+        with contextlib.suppress(DestroyedResourceError):
             self.destroy()
-        except DestroyedResourceError:
-            pass
 
 
 class DestroyedResourceError(WandException, ReferenceError, AttributeError):
@@ -304,10 +299,7 @@ class ResourceLimits(abc.MutableMapping):
                 'thread', 'throttle', 'time', 'width', 'list_length')
 
     def __init__(self):
-        if MAGICK_VERSION_NUMBER < 0x700:
-            self.limits = self._limits6
-        else:
-            self.limits = self._limits7
+        self.limits = self._limits6 if MAGICK_VERSION_NUMBER < 0x700 else self._limits7
 
     def __getitem__(self, r):
         return self.get_resource_limit(r)

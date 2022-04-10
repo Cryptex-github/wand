@@ -488,7 +488,7 @@ def test_primary_points(fx_asset):
 def test_profiles(fx_asset):
     with Image(filename=str(fx_asset.join('beach.jpg'))) as img:
         assert len(img.profiles) == 1
-        assert 'exif' in [d for d in img.profiles]
+        assert 'exif' in list(img.profiles)
         exif_data = img.profiles['exif']
         assert exif_data is not None
         del img.profiles['exif']

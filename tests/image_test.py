@@ -549,13 +549,13 @@ def test_equal(fx_asset):
     with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as a:
         with Image(filename=str(fx_asset.join('mona-lisa.jpg'))) as a2:
             assert a == a2
-            assert not (a != a2)
+            assert a == a2
         with Image(filename=str(fx_asset.join('sasha.jpg'))) as b:
             assert a != b
-            assert not (a == b)
+            assert a != b
         with a.convert('png') as a3:
             assert a == a3
-            assert not (a != a3)
+            assert a == a3
 
 
 def test_object_hash(fx_asset):

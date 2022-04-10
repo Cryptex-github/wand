@@ -57,7 +57,7 @@ def display(image, server_name=':0'):
         else:
             return
     if system in ('Windows', 'Darwin'):
-        ext = '.' + image.format.lower()
+        ext = f'.{image.format.lower()}'
         if ext in ('miff', 'xc'):
             ext = 'png'
         path = tempfile.mktemp(suffix=ext)

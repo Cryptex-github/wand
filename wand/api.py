@@ -140,7 +140,7 @@ def load_library():
         except (IOError, OSError):
             continue
         return libwand, libmagick
-    raise IOError('cannot find library; tried paths: ' + repr(tried_paths))
+    raise IOError(f'cannot find library; tried paths: {repr(tried_paths)}')
 
 
 try:
@@ -162,7 +162,7 @@ except (OSError, IOError):
         mac_pkgmgrs = {'brew': 'brew install freetype imagemagick',
                        'port': 'port install imagemagick'}
         for pkgmgr in mac_pkgmgrs:
-            with os.popen('which ' + pkgmgr) as f:
+            with os.popen(f'which {pkgmgr}') as f:
                 if f.read().strip():
                     msg = mac_pkgmgrs[pkgmgr]
                     break
@@ -226,8 +226,7 @@ if platform.system() == 'Windows':
     if msvcrt:
         libc = ctypes.CDLL(msvcrt)
 else:
-    libc_path = ctypes.util.find_library('c')
-    if libc_path:
+    if libc_path := ctypes.util.find_library('c'):
         libc = ctypes.cdll.LoadLibrary(libc_path)
     else:
         # Attempt to guess popular versions of libc

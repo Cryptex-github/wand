@@ -10,6 +10,7 @@ error happened)::
         print('height =', i.height)
 
 """
+
 import ctypes
 import functools
 import numbers
@@ -43,43 +44,6 @@ __all__ = ('ALPHA_CHANNEL_TYPES', 'AUTO_THRESHOLD_METHODS', 'CHANNELS',
            'ClosedImageError', 'HistogramDict', 'Image', 'ImageProperty',
            'Iterator', 'Metadata', 'OptionDict', 'manipulative',
            'ArtifactTree', 'ProfileDict', 'ConnectedComponentObject')
-
-
-#: (:class:`tuple`) The list of :attr:`~wand.image.BaseImage.alpha_channel`
-#: types.
-#:
-#: - ``'undefined'``
-#: - ``'activate'``
-#: - ``'background'``
-#: - ``'copy'``
-#: - ``'deactivate'``
-#: - ``'discrete'`` - Only available in ImageMagick-7
-#: - ``'extract'``
-#: - ``'off'`` - Only available in ImageMagick-7
-#: - ``'on'`` - Only available in ImageMagick-7
-#: - ``'opaque'``
-#: - ``'reset'`` - Only available in ImageMagick-6
-#: - ``'set'``
-#: - ``'shape'``
-#: - ``'transparent'``
-#: - ``'flatten'`` - Only available in ImageMagick-6
-#: - ``'remove'``
-#:
-#: .. seealso::
-#:    `ImageMagick Image Channel`__
-#:       Describes the SetImageAlphaChannel method which can be used
-#:       to modify alpha channel. Also describes AlphaChannelType
-#:
-#:    __ http://www.imagemagick.org/api/channel.php#SetImageAlphaChannel
-ALPHA_CHANNEL_TYPES = ('undefined', 'activate', 'background', 'copy',
-                       'deactivate', 'extract', 'opaque', 'reset', 'set',
-                       'shape', 'transparent', 'flatten', 'remove',
-                       'associate', 'disassociate')
-if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
-    ALPHA_CHANNEL_TYPES = ('undefined', 'activate', 'associate', 'background',
-                           'copy', 'deactivate', 'discrete', 'disassociate',
-                           'extract', 'off', 'on', 'opaque', 'remove', 'set',
-                           'shape', 'transparent')
 
 
 #: (:class:`tuple`) The list of methods used by
@@ -129,7 +93,46 @@ CHANNELS = dict(undefined=0, red=1, gray=1, cyan=1, green=2, magenta=2,
                 composite_channels=47, all_channels=134217727, true_alpha=64,
                 rgb=7, rgb_channels=7, gray_channels=1, sync_channels=256,
                 default_channels=134217719)
-if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
+ALPHA_CHANNEL_TYPES = (
+    (
+        'undefined',
+        'activate',
+        'associate',
+        'background',
+        'copy',
+        'deactivate',
+        'discrete',
+        'disassociate',
+        'extract',
+        'off',
+        'on',
+        'opaque',
+        'remove',
+        'set',
+        'shape',
+        'transparent',
+    )
+    if MAGICK_VERSION_NUMBER >= 0x700
+    else (
+        'undefined',
+        'activate',
+        'background',
+        'copy',
+        'deactivate',
+        'extract',
+        'opaque',
+        'reset',
+        'set',
+        'shape',
+        'transparent',
+        'flatten',
+        'remove',
+        'associate',
+        'disassociate',
+    )
+)
+
+if MAGICK_VERSION_NUMBER >= 0x700:
     CHANNELS = dict(undefined=0, red=1, gray=1, cyan=1, green=2, magenta=2,
                     blue=4, yellow=4, black=8, alpha=16, opacity=16, index=32,
                     readmask=0x0040, write_mask=128, meta=256,
@@ -138,106 +141,108 @@ if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
                     sync_channels=131072, default_channels=134217727)
 
 
-#: (:class:`tuple`) The list of colorspaces.
-#:
-#: - ``'undefined'``
-#: - ``'rgb'``
-#: - ``'gray'``
-#: - ``'transparent'``
-#: - ``'ohta'``
-#: - ``'lab'``
-#: - ``'xyz'``
-#: - ``'ycbcr'``
-#: - ``'ycc'``
-#: - ``'yiq'``
-#: - ``'ypbpr'``
-#: - ``'yuv'``
-#: - ``'cmyk'``
-#: - ``'srgb'``
-#: - ``'hsb'``
-#: - ``'hsl'``
-#: - ``'hwb'``
-#: - ``'rec601luma'`` - Only available with ImageMagick-6
-#: - ``'rec601ycbcr'``
-#: - ``'rec709luma'`` - Only available with ImageMagick-6
-#: - ``'rec709ycbcr'``
-#: - ``'log'``
-#: - ``'cmy'``
-#: - ``'luv'``
-#: - ``'hcl'``
-#: - ``'lch'``
-#: - ``'lms'``
-#: - ``'lchab'``
-#: - ``'lchuv'``
-#: - ``'scrgb'``
-#: - ``'hsi'``
-#: - ``'hsv'``
-#: - ``'hclp'``
-#: - ``'xyy'`` - Only available with ImageMagick-7
-#: - ``'ydbdr'``
-#:
-#: .. seealso::
-#:
-#:    `ImageMagick Color Management`__
-#:       Describes the ImageMagick color management operations
-#:
-#:    __ http://www.imagemagick.org/script/color-management.php
-#:
-#: .. versionadded:: 0.3.4
-COLORSPACE_TYPES = ('undefined', 'rgb', 'gray', 'transparent', 'ohta', 'lab',
-                    'xyz', 'ycbcr', 'ycc', 'yiq', 'ypbpr', 'yuv', 'cmyk',
-                    'srgb', 'hsb', 'hsl', 'hwb', 'rec601luma', 'rec601ycbcr',
-                    'rec709luma', 'rec709ycbcr', 'log', 'cmy', 'luv', 'hcl',
-                    'lch', 'lms', 'lchab', 'lchuv', 'scrgb', 'hsi', 'hsv',
-                    'hclp', 'ydbdr')
-if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
-    COLORSPACE_TYPES = ('undefined', 'cmy', 'cmyk', 'gray', 'hcl', 'hclp',
-                        'hsb', 'hsi', 'hsl', 'hsv', 'hwb', 'lab', 'lch',
-                        'lchab', 'lchuv', 'log', 'lms', 'luv', 'ohta',
-                        'rec601ycbcr', 'rec709ycbcr', 'rgb', 'scrgb', 'srgb',
-                        'transparent', 'xyy', 'xyz', 'ycbcr', 'ycc', 'ydbdr',
-                        'yiq', 'ypbpr', 'yuv')
+    COLORSPACE_TYPES = (
+        'undefined',
+        'cmy',
+        'cmyk',
+        'gray',
+        'hcl',
+        'hclp',
+        'hsb',
+        'hsi',
+        'hsl',
+        'hsv',
+        'hwb',
+        'lab',
+        'lch',
+        'lchab',
+        'lchuv',
+        'log',
+        'lms',
+        'luv',
+        'ohta',
+        'rec601ycbcr',
+        'rec709ycbcr',
+        'rgb',
+        'scrgb',
+        'srgb',
+        'transparent',
+        'xyy',
+        'xyz',
+        'ycbcr',
+        'ycc',
+        'ydbdr',
+        'yiq',
+        'ypbpr',
+        'yuv',
+    )
 
-#: (:class:`tuple`) The list of compare metric types used by
-#: :meth:`Image.compare() <wand.image.BaseImage.compare>` and
-#: :meth:`Image.similarity() <wand.image.BaseImage.similarity>` methods.
-#:
-#: - ``'undefined'``
-#: - ``'absolute'``
-#: - ``'fuzz'``
-#: - ``'mean_absolute'``
-#: - ``'mean_error_per_pixel'``
-#: - ``'mean_squared'``
-#: - ``'normalized_cross_correlation'``
-#: - ``'peak_absolute'``
-#: - ``'peak_signal_to_noise_ratio'``
-#: - ``'perceptual_hash'`` - Available with ImageMagick-7
-#: - ``'root_mean_square'``
-#: - ``'structural_similarity'`` - Available with ImageMagick-7
-#: - ``'structural_dissimilarity'`` - Available with ImageMagick-7
-#:
-#: .. seealso::
-#:
-#:    `ImageMagick Compare Operations`__
-#:
-#:    __ http://www.imagemagick.org/Usage/compare/
-#:
-#: .. versionadded:: 0.4.3
-#:
-#: .. versionchanged:: 0.5.4 - Remapped :c:data:`MetricType` enum.
-COMPARE_METRICS = ('undefined', 'absolute',
-                   'mean_absolute', 'mean_error_per_pixel',
-                   'mean_squared', 'peak_absolute',
-                   'peak_signal_to_noise_ratio', 'root_mean_square',
-                   'normalized_cross_correlation', 'fuzz')
-if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
-    COMPARE_METRICS = ('undefined', 'absolute', 'fuzz', 'mean_absolute',
-                       'mean_error_per_pixel', 'mean_squared',
-                       'normalized_cross_correlation', 'peak_absolute',
-                       'peak_signal_to_noise_ratio', 'perceptual_hash',
-                       'root_mean_square', 'structural_similarity',
-                       'structural_dissimilarity')
+    COMPARE_METRICS = (
+        'undefined',
+        'absolute',
+        'fuzz',
+        'mean_absolute',
+        'mean_error_per_pixel',
+        'mean_squared',
+        'normalized_cross_correlation',
+        'peak_absolute',
+        'peak_signal_to_noise_ratio',
+        'perceptual_hash',
+        'root_mean_square',
+        'structural_similarity',
+        'structural_dissimilarity',
+    )
 
+else:
+    COLORSPACE_TYPES = (
+        'undefined',
+        'rgb',
+        'gray',
+        'transparent',
+        'ohta',
+        'lab',
+        'xyz',
+        'ycbcr',
+        'ycc',
+        'yiq',
+        'ypbpr',
+        'yuv',
+        'cmyk',
+        'srgb',
+        'hsb',
+        'hsl',
+        'hwb',
+        'rec601luma',
+        'rec601ycbcr',
+        'rec709luma',
+        'rec709ycbcr',
+        'log',
+        'cmy',
+        'luv',
+        'hcl',
+        'lch',
+        'lms',
+        'lchab',
+        'lchuv',
+        'scrgb',
+        'hsi',
+        'hsv',
+        'hclp',
+        'ydbdr',
+    )
+
+    COMPARE_METRICS = (
+        'undefined',
+        'absolute',
+        'mean_absolute',
+        'mean_error_per_pixel',
+        'mean_squared',
+        'peak_absolute',
+        'peak_signal_to_noise_ratio',
+        'root_mean_square',
+        'normalized_cross_correlation',
+        'fuzz',
+    )
 
 #: (:class:`tuple`) The list of complex operators used by
 #: :meth:`Image.complex() <wand.image.BaseImage.complex>`.
@@ -256,179 +261,204 @@ COMPLEX_OPERATORS = ('undefined', 'add', 'conjugate', 'divide', 'magnitude',
                      'multiply', 'real_imaginary', 'subtract')
 
 
-#: (:class:`tuple`) The list of composition operators
-#:
-#: - ``'undefined'``
-#: - ``'alpha'`` - Only available with ImageMagick-7
-#: - ``'atop'``
-#: - ``'blend'``
-#: - ``'blur'``
-#: - ``'bumpmap'``
-#: - ``'change_mask'``
-#: - ``'clear'``
-#: - ``'color_burn'``
-#: - ``'color_dodge'``
-#: - ``'colorize'``
-#: - ``'copy_black'``
-#: - ``'copy_blue'``
-#: - ``'copy'``
-#: - ``'copy_alpha'`` - Only available with ImageMagick-7
-#: - ``'copy_cyan'``
-#: - ``'copy_green'``
-#: - ``'copy_magenta'``
-#: - ``'copy_opacity'`` - Only available with ImageMagick-6
-#: - ``'copy_red'``
-#: - ``'copy_yellow'``
-#: - ``'darken'``
-#: - ``'darken_intensity'``
-#: - ``'difference'``
-#: - ``'displace'``
-#: - ``'dissolve'``
-#: - ``'distort'``
-#: - ``'divide_dst'``
-#: - ``'divide_src'``
-#: - ``'dst_atop'``
-#: - ``'dst'``
-#: - ``'dst_in'``
-#: - ``'dst_out'``
-#: - ``'dst_over'``
-#: - ``'exclusion'``
-#: - ``'hard_light'``
-#: - ``'hard_mix'``
-#: - ``'hue'``
-#: - ``'in'``
-#: - ``'intensity'`` - Only available with ImageMagick-7
-#: - ``'lighten'``
-#: - ``'lighten_intensity'``
-#: - ``'linear_burn'``
-#: - ``'linear_dodge'``
-#: - ``'linear_light'``
-#: - ``'luminize'``
-#: - ``'mathematics'``
-#: - ``'minus_dst'``
-#: - ``'minus_src'``
-#: - ``'modulate'``
-#: - ``'modulus_add'``
-#: - ``'modulus_subtract'``
-#: - ``'multiply'``
-#: - ``'no'``
-#: - ``'out'``
-#: - ``'over'``
-#: - ``'overlay'``
-#: - ``'pegtop_light'``
-#: - ``'pin_light'``
-#: - ``'plus'``
-#: - ``'replace'``
-#: - ``'saturate'``
-#: - ``'screen'``
-#: - ``'soft_light'``
-#: - ``'src_atop'``
-#: - ``'src'``
-#: - ``'src_in'``
-#: - ``'src_out'``
-#: - ``'src_over'``
-#: - ``'threshold'``
-#: - ``'vivid_light'``
-#: - ``'xor'``
-#: - ``'stereo'``
-#:
-#: .. versionchanged:: 0.3.0
-#:    Renamed from :const:`COMPOSITE_OPS` to :const:`COMPOSITE_OPERATORS`.
-#:
-#: .. versionchanged:: 0.5.6
-#:    Operators have been updated to reflect latest changes in C-API.
-#:    For ImageMagick-6, ``'add'`` has been renamed to ``'modulus_add'``,
-#:    ``'subtract'`` has been renamed to ``'modulus_subtract'``,
-#:    ``'divide'`` has been split into ``'divide_dst'`` & ``'divide_src'``, and
-#:    ``'minus'`` has been split into ``'minus_dst'`` & ``'minus_src'``.
-#:
-#: .. seealso::
-#:
-#:    `Compositing Images`__ ImageMagick v6 Examples
-#:       Image composition is the technique of combining images that have,
-#:       or do not have, transparency or an alpha channel.
-#:       This is usually performed using the IM :program:`composite` command.
-#:       It may also be performed as either part of a larger sequence of
-#:       operations or internally by other image operators.
-#:
-#:    `ImageMagick Composition Operators`__
-#:       Demonstrates the results of applying the various composition
-#:       composition operators.
-#:
-#:    __ http://www.imagemagick.org/Usage/compose/
-#:    __ http://www.rubblewebs.co.uk/imagemagick/operators/compose.php
-COMPOSITE_OPERATORS = (
-    'undefined', 'no', 'modulus_add', 'atop', 'blend', 'bumpmap',
-    'change_mask', 'clear', 'color_burn', 'color_dodge', 'colorize',
-    'copy_black', 'copy_blue', 'copy', 'copy_cyan', 'copy_green',
-    'copy_magenta', 'copy_opacity', 'copy_red', 'copy_yellow', 'darken',
-    'dst_atop', 'dst', 'dst_in', 'dst_out', 'dst_over', 'difference',
-    'displace', 'dissolve', 'exclusion', 'hard_light', 'hue', 'in', 'lighten',
-    'linear_light', 'luminize', 'minus_dst', 'modulate', 'multiply', 'out',
-    'over', 'overlay', 'plus', 'replace', 'saturate', 'screen', 'soft_light',
-    'src_atop', 'src', 'src_in', 'src_out', 'src_over', 'modulus_subtract',
-    'threshold', 'xor', 'divide_dst', 'distort', 'blur', 'pegtop_light',
-    'vivid_light', 'pin_light', 'linear_dodge', 'linear_burn', 'mathematics',
-    'divide_src', 'minus_src', 'darken_intensity', 'lighten_intensity',
-    'hard_mix', 'stereo'
-)
-if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
+if MAGICK_VERSION_NUMBER >= 0x700:
     COMPOSITE_OPERATORS = (
-        'undefined', 'alpha', 'atop', 'blend', 'blur', 'bumpmap',
-        'change_mask', 'clear', 'color_burn', 'color_dodge', 'colorize',
-        'copy_black', 'copy_blue', 'copy', 'copy_cyan', 'copy_green',
-        'copy_magenta', 'copy_alpha', 'copy_red', 'copy_yellow', 'darken',
-        'darken_intensity', 'difference', 'displace', 'dissolve', 'distort',
-        'divide_dst', 'divide_src', 'dst_atop', 'dst', 'dst_in', 'dst_out',
-        'dst_over', 'exclusion', 'hard_light', 'hard_mix', 'hue', 'in',
-        'intensity', 'lighten', 'lighten_intensity', 'linear_burn',
-        'linear_dodge', 'linear_light', 'luminize', 'mathematics', 'minus_dst',
-        'minus_src', 'modulate', 'modulus_add', 'modulus_subtract', 'multiply',
-        'no', 'out', 'over', 'overlay', 'pegtop_light', 'pin_light', 'plus',
-        'replace', 'saturate', 'screen', 'soft_light', 'src_atop', 'src',
-        'src_in', 'src_out', 'src_over', 'threshold', 'vivid_light', 'xor',
-        'stereo'
+        'undefined',
+        'alpha',
+        'atop',
+        'blend',
+        'blur',
+        'bumpmap',
+        'change_mask',
+        'clear',
+        'color_burn',
+        'color_dodge',
+        'colorize',
+        'copy_black',
+        'copy_blue',
+        'copy',
+        'copy_cyan',
+        'copy_green',
+        'copy_magenta',
+        'copy_alpha',
+        'copy_red',
+        'copy_yellow',
+        'darken',
+        'darken_intensity',
+        'difference',
+        'displace',
+        'dissolve',
+        'distort',
+        'divide_dst',
+        'divide_src',
+        'dst_atop',
+        'dst',
+        'dst_in',
+        'dst_out',
+        'dst_over',
+        'exclusion',
+        'hard_light',
+        'hard_mix',
+        'hue',
+        'in',
+        'intensity',
+        'lighten',
+        'lighten_intensity',
+        'linear_burn',
+        'linear_dodge',
+        'linear_light',
+        'luminize',
+        'mathematics',
+        'minus_dst',
+        'minus_src',
+        'modulate',
+        'modulus_add',
+        'modulus_subtract',
+        'multiply',
+        'no',
+        'out',
+        'over',
+        'overlay',
+        'pegtop_light',
+        'pin_light',
+        'plus',
+        'replace',
+        'saturate',
+        'screen',
+        'soft_light',
+        'src_atop',
+        'src',
+        'src_in',
+        'src_out',
+        'src_over',
+        'threshold',
+        'vivid_light',
+        'xor',
+        'stereo',
     )
 
-#: (:class:`tuple`) The list of :attr:`Image.compression` types.
-#:
-#: - ``'undefined'``
-#: - ``'b44a'``
-#: - ``'b44'``
-#: - ``'bzip'``
-#: - ``'dxt1'``
-#: - ``'dxt3'``
-#: - ``'dxt5'``
-#: - ``'fax'``
-#: - ``'group4'``
-#: - ``'jbig1'``
-#: - ``'jbig2'``
-#: - ``'jpeg2000'``
-#: - ``'jpeg'``
-#: - ``'losslessjpeg'``
-#: - ``'lzma'``
-#: - ``'lzw'``
-#: - ``'no'``
-#: - ``'piz'``
-#: - ``'pxr24'``
-#: - ``'rle'``
-#: - ``'zip'``
-#: - ``'zips'``
-#:
-#: .. versionadded:: 0.3.6
-#: .. versionchanged:: 0.5.0
-#:    Support for ImageMagick-6 & ImageMagick-7
-COMPRESSION_TYPES = (
-    'undefined', 'no', 'bzip', 'dxt1', 'dxt3', 'dxt5',
-    'fax', 'group4', 'jpeg', 'jpeg2000', 'losslessjpeg',
-    'lzw', 'rle', 'zip', 'zips', 'piz', 'pxr24', 'b44',
-    'b44a', 'lzma', 'jbig1', 'jbig2'
-)
-if MAGICK_VERSION_NUMBER >= 0x700:  # pragma: no cover
     COMPRESSION_TYPES = (
-        'undefined', 'b44a', 'b44', 'bzip', 'dxt1', 'dxt3', 'dxt5', 'fax',
-        'group4', 'jbig1', 'jbig2', 'jpeg2000', 'jpeg', 'losslessjpeg',
-        'lzma', 'lzw', 'no', 'piz', 'pxr24', 'rle', 'zip', 'zips'
+        'undefined',
+        'b44a',
+        'b44',
+        'bzip',
+        'dxt1',
+        'dxt3',
+        'dxt5',
+        'fax',
+        'group4',
+        'jbig1',
+        'jbig2',
+        'jpeg2000',
+        'jpeg',
+        'losslessjpeg',
+        'lzma',
+        'lzw',
+        'no',
+        'piz',
+        'pxr24',
+        'rle',
+        'zip',
+        'zips',
+    )
+
+else:
+    COMPOSITE_OPERATORS = (
+        'undefined',
+        'no',
+        'modulus_add',
+        'atop',
+        'blend',
+        'bumpmap',
+        'change_mask',
+        'clear',
+        'color_burn',
+        'color_dodge',
+        'colorize',
+        'copy_black',
+        'copy_blue',
+        'copy',
+        'copy_cyan',
+        'copy_green',
+        'copy_magenta',
+        'copy_opacity',
+        'copy_red',
+        'copy_yellow',
+        'darken',
+        'dst_atop',
+        'dst',
+        'dst_in',
+        'dst_out',
+        'dst_over',
+        'difference',
+        'displace',
+        'dissolve',
+        'exclusion',
+        'hard_light',
+        'hue',
+        'in',
+        'lighten',
+        'linear_light',
+        'luminize',
+        'minus_dst',
+        'modulate',
+        'multiply',
+        'out',
+        'over',
+        'overlay',
+        'plus',
+        'replace',
+        'saturate',
+        'screen',
+        'soft_light',
+        'src_atop',
+        'src',
+        'src_in',
+        'src_out',
+        'src_over',
+        'modulus_subtract',
+        'threshold',
+        'xor',
+        'divide_dst',
+        'distort',
+        'blur',
+        'pegtop_light',
+        'vivid_light',
+        'pin_light',
+        'linear_dodge',
+        'linear_burn',
+        'mathematics',
+        'divide_src',
+        'minus_src',
+        'darken_intensity',
+        'lighten_intensity',
+        'hard_mix',
+        'stereo',
+    )
+
+    COMPRESSION_TYPES = (
+        'undefined',
+        'no',
+        'bzip',
+        'dxt1',
+        'dxt3',
+        'dxt5',
+        'fax',
+        'group4',
+        'jpeg',
+        'jpeg2000',
+        'losslessjpeg',
+        'lzw',
+        'rle',
+        'zip',
+        'zips',
+        'piz',
+        'pxr24',
+        'b44',
+        'b44a',
+        'lzma',
+        'jbig1',
+        'jbig2',
     )
 
 #: (:class:`tuple`) The list of :attr:`BaseImage.dispose` types.
@@ -1172,7 +1202,7 @@ class BaseImage(Resource):
                     y = slice(y, y + 1)
                 elif not x_slice and y_slice:
                     x = slice(x, x + 1)
-                elif not (x_slice or y_slice):
+                elif not x_slice:
                     if not (isinstance(x, numbers.Integral) and
                             isinstance(y, numbers.Integral)):
                         raise TypeError('x and y must be integral, not ' +
@@ -1192,7 +1222,7 @@ class BaseImage(Resource):
                     with iter(self) as iterator:
                         iterator.seek(y)
                         return iterator.next(x)
-                if not (x.step is None and y.step is None):
+                if x.step is not None or y.step is not None:
                     raise ValueError('slicing with step is unsupported')
                 elif (x.start is None and x.stop is None and
                       y.start is None and y.stop is None):
@@ -1211,15 +1241,12 @@ class BaseImage(Resource):
             elif idx >= self.height:
                 raise IndexError('index must be less than height, but got ' +
                                  repr(idx))
-            elif idx < 0:
-                raise IndexError('index cannot be less than zero, but got ' +
-                                 repr(idx))
             with iter(self) as iterator:
                 iterator.seek(idx)
                 return iterator.next()
         elif isinstance(idx, slice):
             return self[:, idx]
-        raise TypeError('unsupported index type: ' + repr(idx))
+        raise TypeError(f'unsupported index type: {repr(idx)}')
 
     def __setitem__(self, idx, color):
         if isinstance(color, string_type):
@@ -1556,13 +1583,12 @@ class BaseImage(Resource):
         .. versionadded:: 0.5.4
         """
         pixel = library.NewPixelWand()
-        result = library.MagickGetImageBorderColor(self.wand, pixel)
-        if not result:  # pragma: no cover
-            self.raise_exception()
-        else:
+        if result := library.MagickGetImageBorderColor(self.wand, pixel):
             color = Color.from_pixelwand(pixel)
             pixel = library.DestroyPixelWand(pixel)
             return color
+        else:
+            self.raise_exception()
 
     @border_color.setter
     def border_color(self, color):
@@ -1745,22 +1771,24 @@ class BaseImage(Resource):
     @property
     def font(self):
         """(:class:`wand.font.Font`) The current font options."""
-        if not self.font_path:
-            return None
-        return Font(
-            path=text(self.font_path),
-            size=self.font_size,
-            color=self.font_color,
-            antialias=self.antialias,
-            stroke_color=self.stroke_color,
-            stroke_width=self.stroke_width
+        return (
+            Font(
+                path=text(self.font_path),
+                size=self.font_size,
+                color=self.font_color,
+                antialias=self.antialias,
+                stroke_color=self.stroke_color,
+                stroke_width=self.stroke_width,
+            )
+            if self.font_path
+            else None
         )
 
     @font.setter
     @manipulative
     def font(self, font):
         if not isinstance(font, Font):
-            raise TypeError('font must be a wand.font.Font, not ' + repr(font))
+            raise TypeError(f'font must be a wand.font.Font, not {repr(font)}')
         self.font_path = font.path
         self.font_size = font.size
         self.font_color = font.color
@@ -1801,8 +1829,7 @@ class BaseImage(Resource):
 
         """
         font_str = None
-        font_p = library.MagickGetFont(self.wand)
-        if font_p:
+        if font_p := library.MagickGetFont(self.wand):
             font_str = text(ctypes.string_at(font_p))
             font_p = library.MagickRelinquishMemory(font_p)
         return font_str
@@ -1825,7 +1852,7 @@ class BaseImage(Resource):
     def font_size(self, size):
         assertions.assert_real(font_size=size)
         if size < 0.0:
-            raise ValueError('cannot be less than 0.0, but got ' + repr(size))
+            raise ValueError(f'cannot be less than 0.0, but got {repr(size)}')
         r = library.MagickSetPointsize(self.wand, size)
         if not r:  # pragma: no cover
             self.raise_exception()
@@ -1854,8 +1881,7 @@ class BaseImage(Resource):
 
         """
         fmt_str = None
-        fmt_p = library.MagickGetImageFormat(self.wand)
-        if fmt_p:
+        if fmt_p := library.MagickGetImageFormat(self.wand):
             fmt_str = text(ctypes.string_at(fmt_p))
             fmt_p = library.MagickRelinquishMemory(fmt_p)
         return fmt_str
@@ -1866,7 +1892,7 @@ class BaseImage(Resource):
         fmt = fmt.strip()
         r = library.MagickSetImageFormat(self.wand, binary(fmt.upper()))
         if not r:
-            raise ValueError(repr(fmt) + ' is unsupported format')
+            raise ValueError(f'{repr(fmt)} is unsupported format')
         r = library.MagickSetFilename(self.wand,
                                       b'buffer.' + binary(fmt.lower()))
         if not r:  # pragma: no cover
@@ -2061,12 +2087,11 @@ class BaseImage(Resource):
         .. versionadded:: 0.4.1
         """
         pixel = library.NewPixelWand()
-        result = library.MagickGetImageMatteColor(self.wand, pixel)
-        if result:
+        if result := library.MagickGetImageMatteColor(self.wand, pixel):
             color = Color.from_pixelwand(pixel)
             pixel = library.DestroyPixelWand(pixel)
             return color
-        else:  # pragma: no cover
+        else:
             self.raise_exception()
 
     @matte_color.setter
@@ -2453,8 +2478,7 @@ class BaseImage(Resource):
 
         """
         sig_str = None
-        sig_p = library.MagickGetImageSignature(self.wand)
-        if sig_p:
+        if sig_p := library.MagickGetImageSignature(self.wand):
             sig_str = text(ctypes.string_at(sig_p))
             sig_p = library.MagickRelinquishMemory(sig_p)
         return sig_str
@@ -2612,14 +2636,14 @@ class BaseImage(Resource):
         try:
             return self.resource
         except DestroyedResourceError:
-            raise ClosedImageError(repr(self) + ' is closed already')
+            raise ClosedImageError(f'{repr(self)} is closed already')
 
     @wand.setter
     def wand(self, wand):
         try:
             self.resource = wand
         except TypeError:
-            raise TypeError(repr(wand) + ' is not a MagickWand instance')
+            raise TypeError(f'{repr(wand)} is not a MagickWand instance')
 
     @wand.deleter
     def wand(self):
@@ -2682,14 +2706,13 @@ class BaseImage(Resource):
         .. versionadded:: 0.4.1
 
         """
-        v_ptr = library.MagickGetImageProperty(self.wand,
-                                               b'exif:orientation')
-        if v_ptr:
-            exif_orientation = ctypes.string_at(v_ptr)
-            v_ptr = library.MagickRelinquishMemory(v_ptr)
-        else:
+        if not (
+            v_ptr := library.MagickGetImageProperty(self.wand, b'exif:orientation')
+        ):
             return
 
+        exif_orientation = ctypes.string_at(v_ptr)
+        v_ptr = library.MagickRelinquishMemory(v_ptr)
         if not exif_orientation:
             return
 
@@ -3235,7 +3258,7 @@ class BaseImage(Resource):
         """
         assertions.assert_integer(left=left, top=top)
         if font is not None and not isinstance(font, Font):
-            raise TypeError('font must be a wand.font.Font, not ' + repr(font))
+            raise TypeError(f'font must be a wand.font.Font, not {repr(font)}')
         if gravity is not None:
             assertions.string_in_list(GRAVITY_TYPES,
                                       'wand.image.GRAVITY_TYPES',
@@ -3321,10 +3344,10 @@ class BaseImage(Resource):
                 x = 0
             if y is None:
                 y = 0
-        else:
-            if x is not None or y is not None:
-                raise ValueError('x & y can not be used with gravity.')
+        elif x is None and y is None:
             y, x = self._gravity_to_offset(gravity, width, height)
+        else:
+            raise ValueError('x & y can not be used with gravity.')
         assertions.assert_integer(x=x, y=y)
         return library.MagickChopImage(self.wand, width, height, x, y)
 
@@ -3421,7 +3444,7 @@ class BaseImage(Resource):
            Added optional ``channel`` argument.
         """
         if not isinstance(image, BaseImage):
-            raise TypeError('image must be a base image, not ' + repr(image))
+            raise TypeError(f'image must be a base image, not {repr(image)}')
         if MAGICK_VERSION_NUMBER < 0x700:
             if channel is None:
                 r = library.MagickClutImage(self.wand, image.wand)
@@ -3517,7 +3540,7 @@ class BaseImage(Resource):
         .. versionadded:: 0.5.3
         """
         if not isinstance(index, numbers.Integral):
-            raise TypeError('index most be an integer, not ' + repr(index))
+            raise TypeError(f'index most be an integer, not {repr(index)}')
         if index < 0 or index >= self.colors:
             raise ValueError('index is out of palette range')
         if color:
@@ -3618,7 +3641,7 @@ class BaseImage(Resource):
         .. versionadded:: 0.5.3
         """
         if not isinstance(matrix, abc.Sequence):
-            raise TypeError('matrix must be a sequence, not ' + repr(matrix))
+            raise TypeError(f'matrix must be a sequence, not {repr(matrix)}')
         rows = len(matrix)
         columns = None
         values = []
@@ -3630,8 +3653,7 @@ class BaseImage(Resource):
                 columns = len(row)
             elif columns != len(row):
                 raise ValueError('rows have different column length')
-            for column in row:
-                values.append(str(column))
+            values.extend(str(column) for column in row)
         kernel = binary('{0}x{1}:{2}'.format(columns,
                                              rows,
                                              ','.join(values)))
@@ -4385,9 +4407,9 @@ class BaseImage(Resource):
             library.MagickSetOption(tmp.wand, b'format', b'%[convex-hull]')
             library.MagickSetImageFormat(tmp.wand, b'INFO')
             length = ctypes.c_size_t()
-            blob_p = library.MagickGetImageBlob(tmp.wand,
-                                                ctypes.byref(length))
-            if blob_p:
+            if blob_p := library.MagickGetImageBlob(
+                tmp.wand, ctypes.byref(length)
+            ):
                 blob = ctypes.string_at(blob_p, length.value)
                 blob_p = library.MagickRelinquishMemory(blob_p)
                 pts = blob.decode('ascii', 'ignore').strip().split(' ')
@@ -4486,9 +4508,9 @@ class BaseImage(Resource):
             if n is None:
                 return m if null is None else null
             elif not isinstance(n, numbers.Integral):
-                raise TypeError('expected integer, not ' + repr(n))
+                raise TypeError(f'expected integer, not {repr(n)}')
             elif n > m:
-                raise ValueError(repr(n) + ' > ' + repr(m))
+                raise ValueError(f'{repr(n)} > {repr(m)}')
             return m + n if n < 0 else n
 
         # Define left & top if gravity is given.
@@ -4940,10 +4962,10 @@ class BaseImage(Resource):
                 x = 0
             if y is None:
                 y = 0
-        else:
-            if x is not None or y is not None:
-                raise ValueError('x & y can not be used with gravity.')
+        elif x is None and y is None:
             y, x = self._gravity_to_offset(gravity, width, height)
+        else:
+            raise ValueError('x & y can not be used with gravity.')
         assertions.assert_integer(x=x, y=y)
         return library.MagickExtentImage(self.wand, width, height, x, y)
 
@@ -5351,7 +5373,7 @@ class BaseImage(Resource):
         .. versionadded:: 0.6.6
         """
         if not isinstance(image, BaseImage):
-            raise TypeError('expecting a base image, not ' + repr(image))
+            raise TypeError(f'expecting a base image, not {repr(image)}')
         assertions.string_in_list(COMPARE_METRICS,
                                   'wand.image.COMPARE_METRICS',
                                   metric=metric)
@@ -5387,7 +5409,7 @@ class BaseImage(Resource):
            Added ``channel`` argument.
         """
         if not isinstance(image, BaseImage):
-            raise TypeError('expecting a base image, not ' + repr(image))
+            raise TypeError(f'expecting a base image, not {repr(image)}')
         if channel is None:
             r = library.MagickHaldClutImage(self.wand, image.wand)
         else:
@@ -5461,11 +5483,9 @@ class BaseImage(Resource):
                                   'wand.image.PIXEL_INTERPOLATE_METHODS',
                                   method=method)
         if MAGICK_VERSION_NUMBER < 0x700:
-            r = library.MagickImplodeImage(self.wand, amount)
-        else:  # pragma: no cover
-            method_idx = PIXEL_INTERPOLATE_METHODS.index(method)
-            r = library.MagickImplodeImage(self.wand, amount, method_idx)
-        return r
+            return library.MagickImplodeImage(self.wand, amount)
+        method_idx = PIXEL_INTERPOLATE_METHODS.index(method)
+        return library.MagickImplodeImage(self.wand, amount, method_idx)
 
     @trap_exception
     def import_pixels(self, x=0, y=0, width=None, height=None,

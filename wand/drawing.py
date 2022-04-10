@@ -216,8 +216,7 @@ class Drawing(Resource):
 
         """
         clip_path_str = None
-        clip_path_p = library.DrawGetClipPath(self.resource)
-        if clip_path_p:
+        if clip_path_p := library.DrawGetClipPath(self.resource):
             clip_path_str = text(ctypes.string_at(clip_path_p))
             clip_path_p = library.MagickRelinquishMemory(clip_path_p)
         return clip_path_str
@@ -327,8 +326,7 @@ class Drawing(Resource):
 
         """
         font_str = None
-        font_p = library.DrawGetFont(self.resource)
-        if font_p:
+        if font_p := library.DrawGetFont(self.resource):
             font_str = text(ctypes.string_at(font_p))
             font_p = library.MagickRelinquishMemory(font_p)
         return font_str
@@ -350,8 +348,7 @@ class Drawing(Resource):
 
         """
         font_family_str = None
-        font_family_p = library.DrawGetFontFamily(self.resource)
-        if font_family_p:
+        if font_family_p := library.DrawGetFontFamily(self.resource):
             font_family_str = text(ctypes.string_at(font_family_p))
             font_family_p = library.MagickRelinquishMemory(font_family_p)
         return font_family_str
@@ -388,7 +385,7 @@ class Drawing(Resource):
     def font_size(self, size):
         assertions.assert_real(font_size=size)
         if size < 0.0:
-            raise ValueError('cannot be less than 0.0, but got ' + repr(size))
+            raise ValueError(f'cannot be less than 0.0, but got {repr(size)}')
         library.DrawSetFontSize(self.resource, size)
 
     @property
@@ -645,7 +642,7 @@ class Drawing(Resource):
     def stroke_width(self, width):
         assertions.assert_real(stroke_width=width)
         if width < 0.0:
-            raise ValueError('cannot be less than 0.0, but got ' + repr(width))
+            raise ValueError(f'cannot be less than 0.0, but got {repr(width)}')
         library.DrawSetStrokeWidth(self.resource, width)
 
     @property
@@ -740,8 +737,7 @@ class Drawing(Resource):
 
         """
         text_encoding_str = None
-        text_encoding_p = library.DrawGetTextEncoding(self.resource)
-        if text_encoding_p:
+        if text_encoding_p := library.DrawGetTextEncoding(self.resource):
             text_encoding_str = text(ctypes.string_at(text_encoding_p))
             text_encoding_p = library.MagickRelinquishMemory(text_encoding_p)
         return text_encoding_str
@@ -840,19 +836,18 @@ class Drawing(Resource):
            :c:func:`MagickRelinquishMemory` instead of :c:func:`libc.free`.
 
         """
-        vg_p = library.DrawGetVectorGraphics(self.resource)
-        if vg_p:
+        if vg_p := library.DrawGetVectorGraphics(self.resource):
             vg_str = ctypes.string_at(vg_p)
             vg_p = library.MagickRelinquishMemory(vg_p)
         else:
             vg_str = b''
-        return '<wand>' + text(vg_str) + '</wand>'
+        return f'<wand>{text(vg_str)}</wand>'
 
     @vector_graphics.setter
     def vector_graphics(self, vector_graphics):
         if vector_graphics is not None and not isinstance(vector_graphics,
                                                           string_type):
-            raise TypeError('expected a string, not ' + repr(vector_graphics))
+            raise TypeError(f'expected a string, not {repr(vector_graphics)}')
         elif vector_graphics is None:
             # Reset all vector graphic properties on drawing wand.
             library.DrawResetVectorGraphics(self.resource)
@@ -1172,10 +1167,7 @@ class Drawing(Resource):
         else:
             font_metrics_f = library.MagickQueryFontMetrics
         if isinstance(text, text_type):
-            if self.text_encoding:
-                text = text.encode(self.text_encoding)
-            else:
-                text = binary(text)
+            text = text.encode(self.text_encoding) if self.text_encoding else binary(text)
         result = font_metrics_f(image.wand, self.resource, text)
         if not result:  # pragma: no cover
             # Error on drawing context
@@ -1280,10 +1272,6 @@ class Drawing(Resource):
         x, y = to
         if smooth:
             x2, y2 = controls
-        else:
-            (x1, y1), (x2, y2) = controls
-
-        if smooth:
             if relative:
                 library.DrawPathCurveToSmoothRelative(self.resource,
                                                       x2, y2, x, y)
@@ -1291,6 +1279,8 @@ class Drawing(Resource):
                 library.DrawPathCurveToSmoothAbsolute(self.resource,
                                                       x2, y2, x, y)
         else:
+            (x1, y1), (x2, y2) = controls
+
             if relative:
                 library.DrawPathCurveToRelative(self.resource,
                                                 x1, y1, x2, y2, x, y)
@@ -1806,27 +1796,27 @@ class Drawing(Resource):
             raise TypeError('right/width is missing')
         elif bottom is None and height is None:
             raise TypeError('bottom/height is missing')
-        elif not (right is None or width is None):
+        elif right is not None and width is not None:
             raise TypeError('parameters right and width are exclusive each '
                             'other; use one at a time')
-        elif not (bottom is None or height is None):
+        elif bottom is not None and height is not None:
             raise TypeError('parameters bottom and height are exclusive each '
                             'other; use one at a time')
         elif not isinstance(left, numbers.Real):
-            raise TypeError('left must be numbers.Real, not ' + repr(left))
+            raise TypeError(f'left must be numbers.Real, not {repr(left)}')
         elif not isinstance(top, numbers.Real):
-            raise TypeError('top must be numbers.Real, not ' + repr(top))
-        elif not (right is None or isinstance(right, numbers.Real)):
-            raise TypeError('right must be numbers.Real, not ' + repr(right))
-        elif not (bottom is None or isinstance(bottom, numbers.Real)):
-            raise TypeError('bottom must be numbers.Real, not ' + repr(bottom))
-        elif not (width is None or isinstance(width, numbers.Real)):
-            raise TypeError('width must be numbers.Real, not ' + repr(width))
-        elif not (height is None or isinstance(height, numbers.Real)):
-            raise TypeError('height must be numbers.Real, not ' + repr(height))
+            raise TypeError(f'top must be numbers.Real, not {repr(top)}')
+        elif right is not None and not isinstance(right, numbers.Real):
+            raise TypeError(f'right must be numbers.Real, not {repr(right)}')
+        elif bottom is not None and not isinstance(bottom, numbers.Real):
+            raise TypeError(f'bottom must be numbers.Real, not {repr(bottom)}')
+        elif width is not None and not isinstance(width, numbers.Real):
+            raise TypeError(f'width must be numbers.Real, not {repr(width)}')
+        elif height is not None and not isinstance(height, numbers.Real):
+            raise TypeError(f'height must be numbers.Real, not {repr(height)}')
         if right is None:
             if width < 0:
-                raise ValueError('width must be positive, not ' + repr(width))
+                raise ValueError(f'width must be positive, not {repr(width)}')
             right = left + width
         elif right < left:
             raise ValueError('right must be more than left ({0!r}), '
@@ -2115,7 +2105,7 @@ def _list_to_point_info(points):
 
     """
     if not isinstance(points, list):
-        raise TypeError('points must be a list, not ' + repr(points))
+        raise TypeError(f'points must be a list, not {repr(points)}')
     point_length = len(points)
     tuple_size = 2
     point_info_size = point_length * tuple_size

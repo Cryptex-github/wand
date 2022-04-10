@@ -466,10 +466,7 @@ def test_composite_channel(fx_asset):
             (left, bottom + 1), (left - 1, bottom), (left - 1, bottom + 1),
             (right, bottom + 1), (right + 1, bottom), (right + 1, bottom + 1)
         ]
-        if MAGICK_VERSION_NUMBER < 0x700:
-            channel_name = 'red'
-        else:
-            channel_name = 'default_channels'
+        channel_name = 'red' if MAGICK_VERSION_NUMBER < 0x700 else 'default_channels'
         with orig.clone() as img:
             with Color('black') as color:
                 with Image(width=w // 2, height=h // 2,
@@ -654,8 +651,8 @@ def test_crop_gravity(fx_asset):
     with Image(filename=str(fx_asset.join('croptest.png'))) as img:
         width = int(img.width / 3)
         height = int(img.height / 3)
-        mid_width = int(width / 2)
-        mid_height = int(height / 2)
+        mid_width = width // 2
+        mid_height = height // 2
         with img.clone() as center:
             center.crop(width=width, height=height, gravity='center')
             assert center[mid_width, mid_height] == Color('black')
@@ -1242,7 +1239,7 @@ def test_level(fx_asset):
 
 def test_level_channel(fx_asset):
     for chan in ('red', 'green', 'blue'):
-        c = chan + '_int8'
+        c = f'{chan}_int8'
         with Image(filename=str(fx_asset.join('gray_range.jpg'))) as img:
             # Adjust each channel level to make it entirely black
             img.level(0.99, 1.0, channel=chan)
