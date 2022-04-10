@@ -6,11 +6,10 @@ multiple Python versions (2.7, 3.3+) and VM implementations
 (CPython, PyPy).
 
 """
+
 import collections
-try:
+with contextlib.suppress(ImportError):
     import collections.abc
-except ImportError:
-    pass
 import contextlib
 import io
 import sys
@@ -57,7 +56,7 @@ def binary(string, var=None):
         return string
     if var:
         raise TypeError('{0} must be a string, not {1!r}'.format(var, string))
-    raise TypeError('expected a string, not ' + repr(string))
+    raise TypeError(f'expected a string, not {repr(string)}')
 
 
 def to_bytes(value, string_pattern='{0}'):
@@ -76,9 +75,7 @@ def to_bytes(value, string_pattern='{0}'):
 
 if PY3:
     def text(string):
-        if isinstance(string, bytes):
-            return string.decode('utf-8')
-        return string
+        return string.decode('utf-8') if isinstance(string, bytes) else string
 else:
     def text(string):
         """Makes ``string`` to :class:`str` in Python 3.

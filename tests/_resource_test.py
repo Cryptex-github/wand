@@ -48,7 +48,4 @@ def test_limits():
     del resource.limits['area']
     assert resource.limits['area'] == 0
     resource.limits['area'] = area_was  # To restore for other tests.
-    # Non functional smoke test.
-    for _ in resource.limits:
-        pass
     assert len(resource.limits) > 0

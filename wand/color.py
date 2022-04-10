@@ -156,9 +156,7 @@ class Color(Resource):
         return not (self == other)
 
     def __hash__(self):
-        if self.alpha:
-            return hash(self.normalized_string)
-        return hash(None)
+        return hash(self.normalized_string) if self.alpha else hash(None)
 
     def __str__(self):
         return self.string
@@ -224,7 +222,7 @@ class Color(Resource):
             64: 18446744073709551615.0
         }
         if not isinstance(subject, numbers.Number):
-            raise TypeError('Expecting a number, not ' + repr(subject))
+            raise TypeError(f'Expecting a number, not {repr(subject)}')
         if subject < 0.0 or subject > quantum_range[QUANTUM_DEPTH]:
             message = 'Expecting a number between 0 & {0}, not {1}'
             raise ValueError(message.format(quantum_range[QUANTUM_DEPTH],
@@ -614,8 +612,7 @@ class Color(Resource):
         """
         with self:
             string = None
-            ptr = library.PixelGetColorAsNormalizedString(self.resource)
-            if ptr:
+            if ptr := library.PixelGetColorAsNormalizedString(self.resource):
                 string = text(ctypes.string_at(ptr))
                 ptr = library.MagickRelinquishMemory(ptr)
             return string
@@ -671,8 +668,7 @@ class Color(Resource):
         """(:class:`basestring`) The string representation of the color."""
         with self:
             color_string = None
-            ptr = library.PixelGetColorAsString(self.resource)
-            if ptr:
+            if ptr := library.PixelGetColorAsString(self.resource):
                 color_string = text(ctypes.string_at(ptr))
                 ptr = library.MagickRelinquishMemory(ptr)
             return color_string
@@ -763,16 +759,11 @@ def scale_quantum_to_int8(quantum):
     if quantum <= 0:
         return 0
     table = {8: 1, 16: 257.0, 32: 16843009.0, 64: 72340172838076673.0}
-    if MAGICK_HDRI:  # pragma: no cover
-        if QUANTUM_DEPTH == 8:
-            v = quantum / table[QUANTUM_DEPTH]
-        elif QUANTUM_DEPTH == 16:
-            v = ((int(quantum + 128) - (int(quantum + 128) >> 8)) >> 8)
-        elif QUANTUM_DEPTH == 32:
-            v = ((quantum + 8421504) / table[QUANTUM_DEPTH])
-        elif QUANTUM_DEPTH == 64:
-            v = quantum / table[QUANTUM_DEPTH]
-    else:
+    if MAGICK_HDRI and QUANTUM_DEPTH == 16:
+        v = ((int(quantum + 128) - (int(quantum + 128) >> 8)) >> 8)
+    elif MAGICK_HDRI and QUANTUM_DEPTH == 32:
+        v = ((quantum + 8421504) / table[QUANTUM_DEPTH])
+    elif MAGICK_HDRI and QUANTUM_DEPTH in [8, 64] or not MAGICK_HDRI:
         v = quantum / table[QUANTUM_DEPTH]
     if v >= 255:
         return 255

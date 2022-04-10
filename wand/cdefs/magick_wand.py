@@ -44,7 +44,6 @@ def load(lib, IM_VERSION):
         lib.IsMagickWandInstantiated.restype = c_bool
     except AttributeError:
         lib.IsMagickWandInstantiated = None
-        pass
     lib.MagickClearException.argtypes = [c_void_p]
     lib.MagickGetException.argtypes = [c_void_p, POINTER(c_int)]
     lib.MagickGetException.restype = c_void_p

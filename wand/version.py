@@ -34,6 +34,7 @@ You can find the current version in the command line interface:
    additional information about ImageMagick library.
 
 """
+
 from __future__ import print_function
 
 import ctypes
@@ -117,14 +118,7 @@ if libmagick:
     #: .. versionadded:: 0.2.1
     MAGICK_VERSION_INFO = tuple(int(v or 0) for v in _match.groups())
 
-    #: (:class:`basestring`) The date string e.g. ``'2012-06-03'`` of
-    #: :const:`MAGICK_RELEASE_DATE_STRING`.  This value is the exactly same
-    #: string to the result of :c:func:`GetMagickReleaseDate` function.
-    #:
-    #: .. versionadded:: 0.2.1
-    MAGICK_RELEASE_DATE_STRING = text(libmagick.GetMagickReleaseDate())
-
-    if MAGICK_RELEASE_DATE_STRING:
+    if MAGICK_RELEASE_DATE_STRING := text(libmagick.GetMagickReleaseDate()):
         _match = re.match(r'^(\d{4})-?(\d\d)-?(\d\d)$',
                           MAGICK_RELEASE_DATE_STRING)
         #: (:class:`datetime.date`) The release date of the linked ImageMagick
@@ -181,7 +175,7 @@ def configure_options(pattern='*'):
     :rtype: :class:`collections.defaultdict`
     """
     if not isinstance(pattern, string_type):
-        raise TypeError('pattern must be a string, not ' + repr(pattern))
+        raise TypeError(f'pattern must be a string, not {repr(pattern)}')
     # We must force init environment to load user config paths.
     library.MagickWandGenesis()
     pattern_p = ctypes.create_string_buffer(binary(pattern))
@@ -191,8 +185,7 @@ def configure_options(pattern='*'):
                                                     ctypes.byref(config_count))
     for cursor in range(config_count.value):
         config = ctypes.string_at(configs_p[cursor])
-        val_p = library.MagickQueryConfigureOption(config)
-        if val_p:
+        if val_p := library.MagickQueryConfigureOption(config):
             configs[text(config)] = text(ctypes.string_at(val_p))
             val_p = library.MagickRelinquishMemory(val_p)
     if configs_p:
@@ -225,7 +218,7 @@ def fonts(pattern='*'):
     :rtype: :class:`collections.Sequence`
     """
     if not isinstance(pattern, string_type):
-        raise TypeError('pattern must be a string, not ' + repr(pattern))
+        raise TypeError(f'pattern must be a string, not {repr(pattern)}')
     # We must force init environment to load user config paths.
     library.MagickWandGenesis()
     pattern_p = ctypes.create_string_buffer(binary(pattern))
@@ -259,7 +252,7 @@ def formats(pattern='*'):
     :rtype: :class:`collections.Sequence`
     """
     if not isinstance(pattern, string_type):
-        raise TypeError('pattern must be a string, not ' + repr(pattern))
+        raise TypeError(f'pattern must be a string, not {repr(pattern)}')
     # We must force init environment to load user config paths.
     library.MagickWandGenesis()
     pattern_p = ctypes.create_string_buffer(binary(pattern))

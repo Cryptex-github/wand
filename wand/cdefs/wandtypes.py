@@ -3,6 +3,7 @@
 
 .. versionadded:: 0.5.0
 """
+
 import ctypes
 import os
 import sys
@@ -21,16 +22,15 @@ c_ssize_t = ctypes.c_ssize_t
 
 
 env_real = os.getenv('WAND_REAL_TYPE', 'auto')
-if env_real in ('double', 'c_double'):
+if (
+    env_real not in ('double', 'c_double')
+    and env_real not in ('longdouble', 'c_longdouble')
+    and sys.maxsize > 2 ** 32
+    or env_real in ('double', 'c_double')
+):
     c_magick_real_t = ctypes.c_double
-elif env_real in ('longdouble', 'c_longdouble'):
-    c_magick_real_t = ctypes.c_longdouble
 else:
-    # Attempt to guess MagickRealType size
-    if sys.maxsize > 2**32:
-        c_magick_real_t = ctypes.c_double
-    else:
-        c_magick_real_t = ctypes.c_longdouble
+    c_magick_real_t = ctypes.c_longdouble
 del env_real
 
 

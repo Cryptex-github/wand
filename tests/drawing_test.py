@@ -163,7 +163,7 @@ def test_set_get_text_alignment():
 def test_set_get_text_antialias():
     with Drawing() as ctx:
         ctx.text_antialias = True
-        assert ctx.text_antialias is True
+        assert ctx.text_antialias
 
 
 def test_set_get_text_decoration():

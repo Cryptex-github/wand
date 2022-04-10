@@ -291,7 +291,7 @@ def test_black_int8():
 
 def test_string():
     assert Color('black').string in ('rgb(0,0,0)', 'srgb(0,0,0)')
-    assert str(Color('black')) in ('rgb(0,0,0)', 'srgb(0,0,0)')
+    assert str(Color('black')) in {'rgb(0,0,0)', 'srgb(0,0,0)'}
 
 
 def test_fuzz():

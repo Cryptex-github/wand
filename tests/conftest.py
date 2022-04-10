@@ -77,7 +77,7 @@ def pytest_runtest_makereport(item, call):
     # set a report attribute for each phase of a call, which can
     # be "setup", "call", "teardown"
 
-    setattr(item, "rep_" + rep.when, rep)
+    setattr(item, f"rep_{rep.when}", rep)
 
 
 def pytest_report_header(config):
@@ -134,19 +134,21 @@ def display(request):
     def finalize():
         if request.node.rep_call.passed:
             return
-        imgur_client_id = request.config.getoption('--imgur-client-id')
-        if imgur_client_id:
+        if imgur_client_id := request.config.getoption('--imgur-client-id'):
             longrepr = request.node.rep_call.longrepr
             prints = []
             for line, label, format, blob in images:
                 req = urllib2.Request(
                     'https://api.imgur.com/3/image',
-                    headers={'Authorization': 'Client-ID ' + imgur_client_id},
-                    data=urllib.urlencode({
-                        'image': base64.b64encode(blob),
-                        'title': '[{0}] {1}'.format(line, label)
-                    }).encode('ascii')
+                    headers={'Authorization': f'Client-ID {imgur_client_id}'},
+                    data=urllib.urlencode(
+                        {
+                            'image': base64.b64encode(blob),
+                            'title': '[{0}] {1}'.format(line, label),
+                        }
+                    ).encode('ascii'),
                 )
+
                 response = urllib2.urlopen(req)
                 result = json.loads(response.read().decode('utf-8'))
                 prints.append((line, label, result['data']['link']))
